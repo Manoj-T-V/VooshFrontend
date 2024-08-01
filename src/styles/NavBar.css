@@ -3,7 +3,6 @@
   display: flex;
   justify-content: space-between; /* Spread content across the width */
   align-items: center; /* Center items vertically */
-  width: 100%; /* Make the navbar take up the full width of its container */
   margin: 0 auto; /* Center the navbar horizontally if a max-width is set */
   padding: 10px 20px; /* Add padding around the content */
   background-color: #007bff; /* Blue background color */
