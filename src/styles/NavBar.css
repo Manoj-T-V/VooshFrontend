@@ -1,0 +1,48 @@
+/* Navbar.css */
+.navbar {
+  display: flex;
+  justify-content: space-between; /* Spread content across the width */
+  align-items: center; /* Center items vertically */
+  width: 100%; /* Make the navbar take up the full width of its container */
+  max-width: 1200px; /* Optional: limit the maximum width */
+  margin: 0 auto; /* Center the navbar horizontally if a max-width is set */
+  padding: 10px 20px; /* Add padding around the content */
+  background-color: #007bff; /* Blue background color */
+  border-bottom: 1px solid #0056b3; /* Darker blue border for separation */
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center; /* Center items vertically */
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center; /* Center items vertically */
+}
+
+.nav-link {
+  margin-left: 20px; /* Space between links */
+  text-decoration: none; /* Remove underline from links */
+  color: white; /* White text color for links */
+  padding: 5px 10px; /* Add padding to the links */
+  border: none; /* Remove border for buttons */
+  background: none; /* Remove background for links */
+  cursor: pointer; /* Show pointer cursor on hover */
+}
+
+.nav-link:hover {
+  text-decoration: underline; /* Underline on hover */
+}
+
+button.nav-link {
+  background-color: #0056b3; /* Darker blue background color for buttons */
+  color: white; /* White text color for buttons */
+  border-radius: 4px; /* Rounded corners for button */
+  padding: 5px 15px; /* Padding inside the button */
+  border: none; /* Remove default button border */
+}
+
+button.nav-link:hover {
+  background-color: #003d7a; /* Even darker blue background on hover */
+}

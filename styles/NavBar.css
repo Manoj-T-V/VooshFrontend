@@ -1,0 +1,24 @@
+/* Navbar.css */
+.navbar {
+    display: flex;
+    justify-content: space-between; /* Spread content across the width */
+    padding: 0 20px; /* Add padding for spacing */
+    background-color: #f8f9fa; /* Example background color */
+    border-bottom: 1px solid #dee2e6; /* Optional border for separation */
+  }
+  
+  .navbar-left {
+    display: flex;
+    align-items: center; /* Center items vertically */
+  }
+  
+  .nav-link {
+    margin-right: 20px; /* Space between links */
+    text-decoration: none; /* Remove underline from links */
+    color: #007bff; /* Example link color */
+  }
+  
+  .nav-link:hover {
+    text-decoration: underline; /* Underline on hover */
+  }
+  
