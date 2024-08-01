@@ -80,6 +80,9 @@ const styles = {
 
 const TaskBoard = () => {
   const [tasks, setTasks] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortedTasks, setSortedTasks] = useState([]);
+  const [sortBy, setSortBy] = useState('title'); // Default sorting by title
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -93,12 +96,39 @@ const TaskBoard = () => {
         });
         setTasks(response.data);
       } catch (error) {
+        if (error.response) {
+          const { status } = error.response;
+          if (status === 401) {
+            localStorage.removeItem('token');
+            navigate('/login');
+          }
+        }
         console.error("Error fetching tasks: ", error);
       }
     };
 
     fetchTasks();
-  }, []);
+  }, [navigate]);
+
+  useEffect(() => {
+    const filteredTasks = tasks.filter(task =>
+      task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      task.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const sortTasks = (tasks) => {
+      return tasks.slice().sort((a, b) => {
+        if (sortBy === 'title') {
+          return a.title.localeCompare(b.title);
+        } else if (sortBy === 'createdAt') {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        }
+        return 0;
+      });
+    };
+
+    setSortedTasks(sortTasks(filteredTasks));
+  }, [searchQuery, tasks, sortBy]);
 
   const onDragEnd = async (result) => {
     const { destination, source, draggableId } = result;
@@ -111,7 +141,6 @@ const TaskBoard = () => {
       return;
     }
 
-    // Create a copy of the tasks array and move the task to the new position
     const updatedTasks = Array.from(tasks);
     const [movedTask] = updatedTasks.filter(task => task._id === draggableId);
     if (!movedTask) return;
@@ -154,7 +183,7 @@ const TaskBoard = () => {
   };
 
   const getTasksByStatus = (status) => {
-    return tasks.filter(task => task.status === status);
+    return sortedTasks.filter(task => task.status === status);
   };
 
   // Convert the createdAt field to a readable date format
@@ -168,6 +197,24 @@ const TaskBoard = () => {
       >
         Add Task
       </button>
+
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        placeholder="Search tasks..."
+        style={{ margin: '20px', padding: '10px', width: '300px' }}
+      />
+
+      <select
+        value={sortBy}
+        onChange={(e) => setSortBy(e.target.value)}
+        style={{ margin: '20px', padding: '10px' }}
+      >
+        <option value="title">Sort by Title</option>
+        <option value="createdAt">Sort by Creation Date</option>
+      </select>
+
       <DragDropContext onDragEnd={onDragEnd}>
         <div style={styles.container}>
           {Object.values(TaskStatus).map(status => (
