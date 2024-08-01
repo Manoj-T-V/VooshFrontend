@@ -14,7 +14,7 @@ function App() {
     <>
     <Navbar/>
       <Routes>
-      <Route path="/login" element={<><LoginPage /><GoogleAuth /></>} />
+      <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route
           path="/tasks"
