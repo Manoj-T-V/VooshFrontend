@@ -15,7 +15,7 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-left">
-        <Link to="/" className="nav-link">Home</Link>
+        <Link to="/" className="nav-link">Task Manager</Link>
       </div>
       <div className="navbar-right">
         {!isLoggedIn ? (
