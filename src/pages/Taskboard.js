@@ -123,6 +123,9 @@ const TaskBoard = () => {
         } else if (sortBy === 'createdAt') {
           return new Date(b.createdAt) - new Date(a.createdAt);
         }
+         else if (sortBy ==='updatedAt') {
+          return new Date(b.updatedAt) - new Date(a.updatedAt);
+         }
         return 0;
       });
     };
@@ -213,6 +216,7 @@ const TaskBoard = () => {
       >
         <option value="title">Sort by Title</option>
         <option value="createdAt">Sort by Creation Date</option>
+        <option value="updatedAt">Sort by Modified Date</option>
       </select>
 
       <DragDropContext onDragEnd={onDragEnd}>
