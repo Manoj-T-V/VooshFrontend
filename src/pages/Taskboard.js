@@ -82,7 +82,7 @@ const TaskBoard = () => {
   const [tasks, setTasks] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortedTasks, setSortedTasks] = useState([]);
-  const [sortBy, setSortBy] = useState('title'); // Default sorting by title
+  const [sortBy, setSortBy] = useState('updatedAt'); // Default sorting by updatedAt
   const navigate = useNavigate();
 
   useEffect(() => {
