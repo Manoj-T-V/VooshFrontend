@@ -14,18 +14,34 @@ const TaskStatus = {
 
 // Styling objects
 const styles = {
+  boardBackground: {
+    minHeight: '100vh',
+    width: '100vw',
+    background: 'linear-gradient(135deg, #e3f2fd 0%, #fce4ec 100%)',
+    padding: '0',
+    margin: '0',
+    boxSizing: 'border-box',
+  },
   container: {
     display: 'flex',
     justifyContent: 'space-between',
-    margin: '20px',
+    width: '100%',
+  gap: '12px',
+    margin: '0',
+    alignItems: 'flex-start',
+    maxWidth: '100%',
   },
   column: {
-    margin: '0 8px',
-    borderRadius: '4px',
-    width: '300px',
+    flex: 1,
+    margin: '0',
+    borderRadius: '16px',
+    minWidth: '240px',
     minHeight: '500px',
-    padding: '10px',
-    backgroundColor: '#f0f0f0',
+    padding: '18px 12px',
+    background: '#f8fafc',
+    boxSizing: 'border-box',
+    boxShadow: '0 4px 16px 0 rgba(60,60,60,0.08)',
+    transition: 'box-shadow 0.2s',
   },
   columnHeader: {
     marginBottom: '10px',
@@ -33,6 +49,7 @@ const styles = {
     borderRadius: '4px',
     fontSize: '18px',
     fontWeight: 'bold',
+    color: '#fff',
   },
   task: {
     padding: '10px',
@@ -42,39 +59,131 @@ const styles = {
     border: '1px solid lightgray',
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
   },
+  description: {
+    whiteSpace: 'pre-line',
+    fontSize: '0.97em',
+    color: '#222',
+    margin: '0 0 8px 0',
+    lineHeight: 1.5,
+  },
+  taskTitle: {
+    fontSize: '1.22em',
+    fontWeight: 800,
+    color: '#fff',
+    margin: '0 0 8px 0',
+    letterSpacing: '0.7px',
+    lineHeight: 1.3,
+    textShadow: '0 2px 8px rgba(67,206,162,0.18), 0 1px 2px rgba(60,60,60,0.10)',
+    wordBreak: 'break-word',
+    padding: '4px 8px',
+    borderLeft: '5px solid #43cea2',
+    background: 'linear-gradient(90deg, #43cea2 0%, #185a9d 100%)',
+    borderRadius: '6px',
+    boxSizing: 'border-box',
+    boxShadow: '0 2px 12px 0 rgba(67,206,162,0.10)',
+    transition: 'background 0.2s, color 0.2s',
+  },
+  taskDivider: {
+    height: '3px',
+    width: '40%',
+    minWidth: '60px',
+    maxWidth: '120px',
+    margin: '6px 0 12px 0',
+    border: 'none',
+    borderRadius: '2px',
+    background: 'linear-gradient(90deg, #42a5f5 0%, #e3f2fd 100%)',
+    opacity: 0.7,
+    boxShadow: '0 1px 4px 0 rgba(66,165,245,0.10)',
+  },
   button: {
     margin: '5px',
-    padding: '8px 16px',
-    borderRadius: '4px',
+    padding: '10px 22px',
+    borderRadius: '6px',
     border: 'none',
     cursor: 'pointer',
-    fontSize: '14px',
+    fontSize: '16px',
     color: 'white',
+    fontWeight: 'bold',
+    boxShadow: '0 2px 8px 0 rgba(0,0,0,0.08)',
+    letterSpacing: '0.5px',
+    transition: 'background 0.2s, box-shadow 0.2s',
+  },
+  addTaskBar: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px',
+    margin: '0 0 16px 0',
+    justifyContent: 'flex-start',
+    flexWrap: 'wrap',
+  },
+  searchInput: {
+    padding: '10px 16px',
+    borderRadius: '6px',
+    border: '1px solid #bdbdbd',
+    fontSize: '16px',
+    outline: 'none',
+    width: '240px',
+    background: '#fff',
+    boxShadow: '0 1px 4px 0 rgba(0,0,0,0.04)',
+    transition: 'border 0.2s',
+  },
+  select: {
+    padding: '10px 16px',
+    borderRadius: '6px',
+    border: '1px solid #bdbdbd',
+    fontSize: '16px',
+    outline: 'none',
+    background: '#fff',
+    boxShadow: '0 1px 4px 0 rgba(0,0,0,0.04)',
+    transition: 'border 0.2s',
   },
   addButton: {
     backgroundColor: '#007bff', // Blue background
   },
   editButton: {
-    backgroundColor: '#17a2b8', // Cyan
+    background: 'linear-gradient(90deg, #43cea2 0%, #185a9d 100%)',
+    color: '#fff',
+    border: 'none',
+    boxShadow: '0 2px 8px 0 rgba(67,206,162,0.10)',
   },
   detailsButton: {
-    backgroundColor: '#28a745', // Green
+    background: 'linear-gradient(90deg, #ffb347 0%, #ffcc33 100%)',
+    color: '#fff',
+    border: 'none',
+    boxShadow: '0 2px 8px 0 rgba(255,179,71,0.10)',
   },
   deleteButton: {
-    backgroundColor: '#dc3545', // Red
+    background: 'linear-gradient(90deg, #ff512f 0%, #dd2476 100%)',
+    color: '#fff',
+    border: 'none',
+    boxShadow: '0 2px 8px 0 rgba(221,36,118,0.10)',
   },
   todoColumn: {
-    backgroundColor: '#e7f1ff', // Light Blue
+    background: 'linear-gradient(120deg, #bbdefb 60%, #90caf9 100%)',
+    boxShadow: '0 2px 12px 0 rgba(66,165,245,0.10)',
   },
   inProgressColumn: {
-    backgroundColor: '#fff3e0', // Light Orange
+    background: 'linear-gradient(120deg, #fff9c4 60%, #ffe082 100%)',
+    boxShadow: '0 2px 12px 0 rgba(255,179,0,0.10)',
   },
   doneColumn: {
-    backgroundColor: '#d4edda', // Light Green
+    background: 'linear-gradient(120deg, #c8e6c9 60%, #a5d6a7 100%)',
+    boxShadow: '0 2px 12px 0 rgba(56,142,60,0.10)',
+  },
+  todoHeader: {
+    backgroundColor: '#42a5f5', // Blue
+  },
+  inProgressHeader: {
+    backgroundColor: '#ffb300', // Amber
+  },
+  doneHeader: {
+    backgroundColor: '#388e3c', // Green
   },
   createdAt: {
-    fontSize: '12px',
-    color: 'gray',
+    fontSize: '0.93em',
+    color: '#666',
+    margin: '4px 0 0 0',
+    letterSpacing: '0.2px',
   },
 };
 
@@ -193,32 +302,31 @@ const TaskBoard = () => {
   const formatCreatedAt = (createdAt) => new Date(createdAt).toLocaleString();
 
   return (
-    <div>
-      <button 
-        onClick={() => navigate('/tasks/create')} 
-        style={{ ...styles.button, ...styles.addButton }}
-      >
-        Add Task
-      </button>
-
-      <input
-        type="text"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        placeholder="Search tasks..."
-        style={{ margin: '20px', padding: '10px', width: '300px' }}
-      />
-
-      <select
-        value={sortBy}
-        onChange={(e) => setSortBy(e.target.value)}
-        style={{ margin: '20px', padding: '10px' }}
-      >
-        <option value="title">Sort by Title</option>
-        <option value="createdAt">Sort by Creation Date</option>
-        <option value="updatedAt">Sort by Modified Date</option>
-      </select>
-
+    <div style={styles.boardBackground}>
+      <div style={styles.addTaskBar}>
+        <button
+          onClick={() => navigate('/tasks/create')}
+          style={{ ...styles.button, ...styles.addButton }}
+        >
+          ＋ Add Task
+        </button>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search tasks..."
+          style={styles.searchInput}
+        />
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          style={styles.select}
+        >
+          <option value="title">Sort by Title</option>
+          <option value="createdAt">Sort by Creation Date</option>
+          <option value="updatedAt">Sort by Modified Date</option>
+        </select>
+      </div>
       <DragDropContext onDragEnd={onDragEnd}>
         <div style={styles.container}>
           {Object.values(TaskStatus).map(status => (
@@ -229,7 +337,18 @@ const TaskBoard = () => {
                   {...provided.droppableProps}
                   style={{ ...styles.column, ...styles[`${status.toLowerCase().replace(/ /g, '')}Column`] }}
                 >
-                  <div style={styles.columnHeader}>{status}</div>
+                  <div
+                    style={{
+                      ...styles.columnHeader,
+                      ...(status === TaskStatus.TODO
+                        ? styles.todoHeader
+                        : status === TaskStatus.IN_PROGRESS
+                        ? styles.inProgressHeader
+                        : styles.doneHeader),
+                    }}
+                  >
+                    {status}
+                  </div>
                   {getTasksByStatus(status).map((task, index) => (
                     <Draggable key={task._id} draggableId={task._id} index={index}>
                       {(provided) => (
@@ -239,8 +358,8 @@ const TaskBoard = () => {
                           {...provided.dragHandleProps}
                           style={{ ...styles.task, ...provided.draggableProps.style }}
                         >
-                          <h3>{task.title}</h3>
-                          <p>{task.description}</p>
+                          <h3 style={styles.taskTitle}>{task.title}</h3>
+                          <p style={styles.description}>{task.description}</p>
                           <p style={styles.createdAt}><strong>Created At:</strong> {formatCreatedAt(task.createdAt)}</p>
                           <button 
                             onClick={() => handleEdit(task._id)} 

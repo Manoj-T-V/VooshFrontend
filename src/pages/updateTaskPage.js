@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -65,59 +66,165 @@ function UpdateTaskPage() {
       justifyContent: 'center',
       alignItems: 'center',
       minHeight: '100vh',
-      backgroundColor: '#f8f9fa', // Light gray background
+      background: 'linear-gradient(135deg, #e3f2fd 0%, #fce4ec 100%)',
     },
     card: {
-      width: '400px',
-      padding: '20px',
-      borderRadius: '8px',
-      boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
-      backgroundColor: '#ffffff', // White background for the card
+      width: '410px',
+      padding: '32px 28px 24px 28px',
+      borderRadius: '16px',
+      boxShadow: '0 6px 32px 0 rgba(80,80,180,0.10)',
+      background: '#fff',
       boxSizing: 'border-box',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+    },
+    heading: {
+      fontSize: '1.6em',
+      fontWeight: 700,
+      color: '#2575fc',
+      marginBottom: '18px',
+      letterSpacing: '0.5px',
+      textAlign: 'center',
     },
     input: {
       width: '100%',
-      padding: '10px',
-      margin: '8px 0',
-      borderRadius: '4px',
-      border: '1px solid #ced4da',
+      padding: '12px 14px',
+      margin: '10px 0',
+      borderRadius: '6px',
+      border: '1.5px solid #bdbdbd',
       boxSizing: 'border-box',
+      fontSize: '1.08em',
+      background: '#f8fafc',
+      transition: 'border 0.2s',
     },
     textarea: {
       width: '100%',
-      padding: '10px',
-      margin: '8px 0',
-      borderRadius: '4px',
-      border: '1px solid #ced4da',
+      padding: '12px 14px',
+      margin: '10px 0',
+      borderRadius: '6px',
+      border: '1.5px solid #bdbdbd',
       boxSizing: 'border-box',
+      fontSize: '1.08em',
+      background: '#f8fafc',
       resize: 'vertical',
+      minHeight: '130px',
+      transition: 'border 0.2s',
     },
     select: {
       width: '100%',
-      padding: '10px',
-      margin: '8px 0',
-      borderRadius: '4px',
-      border: '1px solid #ced4da',
+      padding: '12px 14px',
+      margin: '10px 0',
+      borderRadius: '6px',
+      border: '1.5px solid #bdbdbd',
       boxSizing: 'border-box',
+      fontSize: '1.08em',
+      background: '#f8fafc',
+      transition: 'border 0.2s',
     },
     button: {
       width: '100%',
-      padding: '10px',
-      borderRadius: '4px',
+      padding: '12px',
+      borderRadius: '6px',
       border: 'none',
       cursor: 'pointer',
-      fontSize: '16px',
-      color: '#ffffff',
-      backgroundColor: '#007bff', // Blue background
-      marginTop: '10px',
+      fontSize: '1.13em',
+      color: '#fff',
+      background: 'linear-gradient(90deg, #6a11cb 0%, #2575fc 100%)',
+      marginTop: '18px',
+      fontWeight: 700,
+      letterSpacing: '0.5px',
+      boxShadow: '0 2px 8px 0 rgba(80,80,180,0.10)',
+      transition: 'background 0.2s, box-shadow 0.2s',
     },
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h2>Update Task</h2>
-        <form onSubmit={handleSubmit}>
+    <div style={{...styles.container, position: 'relative', overflow: 'hidden'}}>
+      {/* Animated floating circles background */}
+      <motion.div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: 0,
+          pointerEvents: 'none',
+        }}
+        aria-hidden="true"
+      >
+        {/* Circle 1 */}
+        <motion.div
+          style={{
+            position: 'absolute',
+            width: 160,
+            height: 160,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle at 30% 30%, #a1c4fd 80%, #c2e9fb 100%)',
+            top: 60,
+            left: 40,
+            opacity: 0.45,
+            filter: 'blur(2px)',
+          }}
+          animate={{
+            y: [0, 30, 0],
+            x: [0, 20, 0],
+            scale: [1, 1.08, 1],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        {/* Circle 2 */}
+        <motion.div
+          style={{
+            position: 'absolute',
+            width: 110,
+            height: 110,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle at 70% 70%, #fbc2eb 70%, #f8fafc 100%)',
+            bottom: 80,
+            right: 60,
+            opacity: 0.38,
+            filter: 'blur(1.5px)',
+          }}
+          animate={{
+            y: [0, -22, 0],
+            x: [0, -18, 0],
+            scale: [1, 1.12, 1],
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+        />
+        {/* Circle 3 */}
+        <motion.div
+          style={{
+            position: 'absolute',
+            width: 90,
+            height: 90,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle at 50% 50%, #b2f7ef 70%, #e0c3fc 100%)',
+            top: 180,
+            right: 120,
+            opacity: 0.32,
+            filter: 'blur(1.5px)',
+          }}
+          animate={{
+            y: [0, 18, 0],
+            x: [0, 12, 0],
+            scale: [1, 1.09, 1],
+          }}
+          transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
+        />
+      </motion.div>
+      {/* Card content (above background) */}
+      <motion.div
+        style={{...styles.card, zIndex: 1, position: 'relative'}}
+        initial={{ opacity: 0, y: 60, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ type: 'spring', stiffness: 60, damping: 14 }}
+        whileHover={{ scale: 1.025, boxShadow: '0 10px 32px 0 rgba(80,80,180,0.18)' }}
+      >
+        <div style={styles.heading}>Update Task</div>
+        <form onSubmit={handleSubmit} style={{width: '100%'}}>
           <input
             type="text"
             value={title}
@@ -142,7 +249,7 @@ function UpdateTaskPage() {
           </select>
           <button type="submit" style={styles.button}>Update</button>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 }

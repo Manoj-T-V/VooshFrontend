@@ -15,16 +15,19 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-left">
-        <Link to="/" className="nav-link">Task Manager</Link>
+        <Link to="/" className="nav-logo">
+          <span role="img" aria-label="logo" style={{fontSize: '1.7em', verticalAlign: 'middle', marginRight: '8px'}}>🗂️</span>
+          <span className="nav-title">TaskFlow Pro</span>
+        </Link>
       </div>
       <div className="navbar-right">
         {!isLoggedIn ? (
           <>
-            <Link to="/login" className="nav-link">Login</Link>
-            <Link to="/signup" className="nav-link">Signup</Link>
+            <Link to="/login" className="nav-link login">Login</Link>
+            <Link to="/signup" className="nav-link signup">Signup</Link>
           </>
         ) : (
-          <button onClick={handleLogout} className="nav-link">Logout</button>
+          <button onClick={handleLogout} className="nav-link logout">Logout</button>
         )}
       </div>
     </nav>

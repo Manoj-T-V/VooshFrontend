@@ -1,47 +1,101 @@
 /* Navbar.css */
 .navbar {
   display: flex;
-  justify-content: space-between; /* Spread content across the width */
-  align-items: center; /* Center items vertically */
-  margin: 0 auto; /* Center the navbar horizontally if a max-width is set */
-  padding: 10px 20px; /* Add padding around the content */
-  background-color: #007bff; /* Blue background color */
-  border-bottom: 1px solid #0056b3; /* Darker blue border for separation */
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 auto;
+  padding: 0 32px;
+  min-height: 60px;
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+  border-bottom: 2px solid #4e54c8;
+  box-shadow: 0 4px 16px 0 rgba(80,80,180,0.10);
 }
 
 .navbar-left {
   display: flex;
-  align-items: center; /* Center items vertically */
+  align-items: center;
 }
 
 .navbar-right {
   display: flex;
-  padding-right: 30px;
-  align-items: center; /* Center items vertically */
+  align-items: center;
+  gap: 10px;
 }
 
 .nav-link {
-  margin-left: 20px; /* Space between links */
-  text-decoration: none; /* Remove underline from links */
-  color: white; /* White text color for links */
-  padding: 5px 10px; /* Add padding to the links */
-  border: none; /* Remove border for buttons */
-  background: none; /* Remove background for links */
-  cursor: pointer; /* Show pointer cursor on hover */
+  margin-left: 16px;
+  text-decoration: none;
+  color: white;
+  padding: 7px 18px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1.08em;
+  border-radius: 5px;
+  transition: background 0.2s, color 0.2s;
+}
+.nav-link.login {
+  background: linear-gradient(90deg, #43cea2 0%, #185a9d 100%);
+}
+.nav-link.signup {
+  background: linear-gradient(90deg, #ff512f 0%, #dd2476 100%);
+}
+button.nav-link.logout {
+  background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%);
+  color: #333;
 }
 
 .nav-link:hover {
-  text-decoration: underline; /* Underline on hover */
+  background: #fff;
+  color: #6a11cb;
+  text-decoration: none;
+  box-shadow: 0 2px 8px 0 rgba(106,17,203,0.08);
+}
+.nav-link.login:hover {
+  background: #185a9d;
+  color: #fff;
+}
+.nav-link.signup:hover {
+  background: #dd2476;
+  color: #fff;
+}
+button.nav-link.logout:hover {
+  background: #ffd200;
+  color: #6a11cb;
 }
 
 button.nav-link {
-  background-color: #0056b3; /* Darker blue background color for buttons */
-  color: white; /* White text color for buttons */
-  border-radius: 4px; /* Rounded corners for button */
-  padding: 5px 15px; /* Padding inside the button */
-  border: none; /* Remove default button border */
+  background-color: #0056b3;
+  color: white;
+  border-radius: 5px;
+  padding: 7px 18px;
+  border: none;
+  font-size: 1.08em;
+  font-weight: 500;
+  transition: background 0.2s;
 }
 
 button.nav-link:hover {
-  background-color: #003d7a; /* Even darker blue background on hover */
+  background-color: #003d7a;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: 1px;
+  padding: 6px 0;
+  transition: color 0.2s;
+}
+.nav-logo:hover {
+  color: #ffd700;
+}
+.nav-title {
+  font-size: 1.18em;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin-left: 2px;
 }
