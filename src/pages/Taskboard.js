@@ -16,20 +16,40 @@ const TaskStatus = {
 const styles = {
   boardBackground: {
     minHeight: '100vh',
-    width: '100vw',
+    width: '100%',
+    maxWidth: '1400px',
     background: 'linear-gradient(135deg, #e3f2fd 0%, #fce4ec 100%)',
-    padding: '0',
-    margin: '0',
+    padding: '0 32px',
+    margin: '0 auto',
     boxSizing: 'border-box',
+    overflowX: 'hidden',
+    position: 'relative',
   },
   container: {
     display: 'flex',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     width: '100%',
-  gap: '12px',
+    maxWidth: '100vw',
+    gap: '12px',
     margin: '0',
     alignItems: 'flex-start',
-    maxWidth: '100%',
+    boxSizing: 'border-box',
+    overflowX: 'hidden',
+  },
+
+  // Responsive columns for small screens
+  '@media (max-width: 900px)': {
+    container: {
+      flexDirection: 'column',
+      alignItems: 'stretch',
+      gap: '24px',
+    },
+    column: {
+      minWidth: '0',
+      width: '100%',
+      marginBottom: '18px',
+    },
   },
   column: {
     flex: 1,
@@ -128,14 +148,35 @@ const styles = {
     transition: 'border 0.2s',
   },
   select: {
-    padding: '10px 16px',
-    borderRadius: '6px',
-    border: '1px solid #bdbdbd',
+    padding: '10px 36px 10px 16px',
+    borderRadius: '10px',
+    border: '1.5px solid #bdbdbd',
     fontSize: '16px',
     outline: 'none',
-    background: '#fff',
-    boxShadow: '0 1px 4px 0 rgba(0,0,0,0.04)',
-    transition: 'border 0.2s',
+    background: 'linear-gradient(90deg, #e3eafc 0%, #fce4ec 100%)',
+    boxShadow: '0 2px 8px 0 rgba(80,80,180,0.10)',
+    color: '#222',
+    fontWeight: 600,
+    marginLeft: '8px',
+    marginRight: '8px',
+    transition: 'background 0.2s, box-shadow 0.2s',
+    cursor: 'pointer',
+    appearance: 'none',
+    WebkitAppearance: 'none',
+    MozAppearance: 'none',
+    position: 'relative',
+    backgroundImage: `url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 6L8 10L12 6' stroke='%236a11cb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'right 12px center',
+    backgroundSize: '18px 18px',
+  },
+
+  option: {
+    fontSize: '16px',
+    color: '#2575fc',
+    background: '#fce4ec',
+    fontWeight: 500,
+    padding: '8px 16px',
   },
   addButton: {
     backgroundColor: '#007bff', // Blue background
@@ -192,6 +233,7 @@ const TaskBoard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortedTasks, setSortedTasks] = useState([]);
   const [sortBy, setSortBy] = useState('updatedAt'); // Default sorting by updatedAt
+  const [statusFilter, setStatusFilter] = useState('all');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -220,11 +262,13 @@ const TaskBoard = () => {
   }, [navigate]);
 
   useEffect(() => {
-    const filteredTasks = tasks.filter(task =>
+    let filteredTasks = tasks.filter(task =>
       task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       task.description.toLowerCase().includes(searchQuery.toLowerCase())
     );
-
+    if (statusFilter !== 'all') {
+      filteredTasks = filteredTasks.filter(task => task.status === statusFilter);
+    }
     const sortTasks = (tasks) => {
       return tasks.slice().sort((a, b) => {
         if (sortBy === 'title') {
@@ -238,9 +282,8 @@ const TaskBoard = () => {
         return 0;
       });
     };
-
     setSortedTasks(sortTasks(filteredTasks));
-  }, [searchQuery, tasks, sortBy]);
+  }, [searchQuery, tasks, sortBy, statusFilter]);
 
   const onDragEnd = async (result) => {
     const { destination, source, draggableId } = result;
@@ -317,77 +360,91 @@ const TaskBoard = () => {
           placeholder="Search tasks..."
           style={styles.searchInput}
         />
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          style={styles.select}
-        >
-          <option value="title">Sort by Title</option>
-          <option value="createdAt">Sort by Creation Date</option>
-          <option value="updatedAt">Sort by Modified Date</option>
-        </select>
+          <div style={styles.dropdownGroup}>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            style={styles.select}
+          >
+            <option style={styles.option} value="title">Sort by Title</option>
+            <option style={styles.option} value="createdAt">Sort by Creation Date</option>
+            <option style={styles.option} value="updatedAt">Sort by Modified Date</option>
+          </select>
+          <select
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            style={{ ...styles.select, minWidth: 140 }}
+          >
+            <option style={styles.option} value="all">Show All</option>
+            <option style={styles.option} value="To Do">To Do</option>
+            <option style={styles.option} value="In Progress">In Progress</option>
+            <option style={styles.option} value="Done">Done</option>
+          </select>
+        </div>
       </div>
       <DragDropContext onDragEnd={onDragEnd}>
         <div style={styles.container}>
-          {Object.values(TaskStatus).map(status => (
-            <Droppable key={status} droppableId={status}>
-              {(provided) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  style={{ ...styles.column, ...styles[`${status.toLowerCase().replace(/ /g, '')}Column`] }}
-                >
+          {Object.values(TaskStatus)
+            .filter(status => statusFilter === 'all' || status === statusFilter)
+            .map(status => (
+              <Droppable key={status} droppableId={status}>
+                {(provided) => (
                   <div
-                    style={{
-                      ...styles.columnHeader,
-                      ...(status === TaskStatus.TODO
-                        ? styles.todoHeader
-                        : status === TaskStatus.IN_PROGRESS
-                        ? styles.inProgressHeader
-                        : styles.doneHeader),
-                    }}
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    style={{ ...styles.column, ...styles[`${status.toLowerCase().replace(/ /g, '')}Column`] }}
                   >
-                    {status}
+                    <div
+                      style={{
+                        ...styles.columnHeader,
+                        ...(status === TaskStatus.TODO
+                          ? styles.todoHeader
+                          : status === TaskStatus.IN_PROGRESS
+                          ? styles.inProgressHeader
+                          : styles.doneHeader),
+                      }}
+                    >
+                      {status}
+                    </div>
+                    {getTasksByStatus(status).map((task, index) => (
+                      <Draggable key={task._id} draggableId={task._id} index={index}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            style={{ ...styles.task, ...provided.draggableProps.style }}
+                          >
+                            <h3 style={styles.taskTitle}>{task.title}</h3>
+                            <p style={styles.description}>{task.description}</p>
+                            <p style={styles.createdAt}><strong>Created At:</strong> {formatCreatedAt(task.createdAt)}</p>
+                            <button 
+                              onClick={() => handleEdit(task._id)} 
+                              style={{ ...styles.button, ...styles.editButton }}
+                            >
+                              Edit
+                            </button>
+                            <button 
+                              onClick={() => handleDetails(task._id)} 
+                              style={{ ...styles.button, ...styles.detailsButton }}
+                            >
+                              Details
+                            </button>
+                            <button 
+                              onClick={() => handleDelete(task._id)} 
+                              style={{ ...styles.button, ...styles.deleteButton }}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
                   </div>
-                  {getTasksByStatus(status).map((task, index) => (
-                    <Draggable key={task._id} draggableId={task._id} index={index}>
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          style={{ ...styles.task, ...provided.draggableProps.style }}
-                        >
-                          <h3 style={styles.taskTitle}>{task.title}</h3>
-                          <p style={styles.description}>{task.description}</p>
-                          <p style={styles.createdAt}><strong>Created At:</strong> {formatCreatedAt(task.createdAt)}</p>
-                          <button 
-                            onClick={() => handleEdit(task._id)} 
-                            style={{ ...styles.button, ...styles.editButton }}
-                          >
-                            Edit
-                          </button>
-                          <button 
-                            onClick={() => handleDetails(task._id)} 
-                            style={{ ...styles.button, ...styles.detailsButton }}
-                          >
-                            Details
-                          </button>
-                          <button 
-                            onClick={() => handleDelete(task._id)} 
-                            style={{ ...styles.button, ...styles.deleteButton }}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          ))}
+                )}
+              </Droppable>
+            ))}
         </div>
       </DragDropContext>
     </div>
