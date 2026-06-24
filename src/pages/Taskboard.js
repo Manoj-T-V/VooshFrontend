@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 // API URL and Task Status Enum
 const apiUrl = process.env.REACT_APP_API_URL;
+const aiSummaryEndpoint = process.env.REACT_APP_TASK_SUMMARY_ENDPOINT || '/api/tasks/ask-summary';
 
 const TaskStatus = {
   TODO: 'To Do',
@@ -226,6 +227,163 @@ const styles = {
     margin: '4px 0 0 0',
     letterSpacing: '0.2px',
   },
+  aiLauncherButton: {
+    background: 'linear-gradient(90deg, #1d4ed8 0%, #2563eb 55%, #7c3aed 100%)',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '10px',
+    padding: '10px 16px',
+    cursor: 'pointer',
+    fontWeight: 700,
+    letterSpacing: '0.3px',
+    boxShadow: '0 8px 18px rgba(37, 99, 235, 0.22)',
+  },
+  aiModalOverlay: {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(13, 24, 51, 0.45)',
+    backdropFilter: 'blur(4px)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1100,
+    padding: '16px',
+    boxSizing: 'border-box',
+  },
+  aiModalCard: {
+    width: 'min(900px, 100%)',
+    maxHeight: '85vh',
+    overflowY: 'auto',
+    borderRadius: '20px',
+    border: '1px solid #d8e6ff',
+    background: 'linear-gradient(120deg, #ffffff 0%, #f5f9ff 65%, #fff5fb 100%)',
+    boxShadow: '0 16px 40px rgba(15, 23, 42, 0.22)',
+    padding: '18px',
+    boxSizing: 'border-box',
+  },
+  aiHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: '12px',
+    flexWrap: 'wrap',
+    marginBottom: '12px',
+  },
+  aiTitle: {
+    margin: 0,
+    fontSize: '1.18em',
+    color: '#17317f',
+    letterSpacing: '0.3px',
+  },
+  aiSubtitle: {
+    margin: '4px 0 0 0',
+    fontSize: '0.92em',
+    color: '#4a5a92',
+  },
+  aiCloseButton: {
+    border: '1px solid #d4ddff',
+    borderRadius: '10px',
+    background: '#fff',
+    color: '#1d4ed8',
+    fontWeight: 700,
+    cursor: 'pointer',
+    padding: '8px 12px',
+  },
+  aiCountSelect: {
+    borderRadius: '10px',
+    border: '1px solid #bdd3ff',
+    background: '#fff',
+    color: '#1f3a8a',
+    fontWeight: 600,
+    padding: '9px 12px',
+    outline: 'none',
+  },
+  aiInputArea: {
+    display: 'grid',
+    gridTemplateColumns: '1fr auto',
+    gap: '10px',
+    alignItems: 'stretch',
+  },
+  aiTextarea: {
+    width: '100%',
+    minHeight: '74px',
+    borderRadius: '12px',
+    border: '1.5px solid #c8d9ff',
+    padding: '12px 14px',
+    resize: 'vertical',
+    fontSize: '0.97em',
+    boxSizing: 'border-box',
+    outline: 'none',
+    color: '#1e293b',
+    background: '#ffffff',
+  },
+  aiAskButton: {
+    border: 'none',
+    borderRadius: '12px',
+    padding: '0 18px',
+    minWidth: '132px',
+    background: 'linear-gradient(90deg, #1d4ed8 0%, #2563eb 60%, #7c3aed 100%)',
+    color: '#fff',
+    fontWeight: 700,
+    cursor: 'pointer',
+    boxShadow: '0 10px 20px rgba(37, 99, 235, 0.24)',
+  },
+  aiQuickPrompts: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '8px',
+    marginTop: '10px',
+  },
+  aiQuickButton: {
+    border: '1px solid #d0ddff',
+    background: '#fff',
+    color: '#27408a',
+    borderRadius: '999px',
+    padding: '7px 11px',
+    fontSize: '0.85em',
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+  aiError: {
+    marginTop: '12px',
+    borderRadius: '10px',
+    border: '1px solid #fecaca',
+    background: '#fff1f2',
+    color: '#9f1239',
+    padding: '10px 12px',
+    fontWeight: 600,
+    fontSize: '0.9em',
+  },
+  aiAnswerCard: {
+    marginTop: '12px',
+    borderRadius: '14px',
+    border: '1px solid #d5e3ff',
+    background: 'linear-gradient(160deg, #ffffff 0%, #f7faff 100%)',
+    padding: '14px 14px 12px',
+    boxShadow: '0 5px 16px rgba(36, 64, 132, 0.09)',
+  },
+  aiAnswerMeta: {
+    display: 'flex',
+    gap: '8px',
+    flexWrap: 'wrap',
+    marginBottom: '8px',
+  },
+  aiMetaPill: {
+    borderRadius: '999px',
+    background: '#eaf1ff',
+    color: '#1e40af',
+    padding: '4px 9px',
+    fontSize: '0.78em',
+    fontWeight: 700,
+    letterSpacing: '0.2px',
+  },
+  aiAnswerText: {
+    margin: 0,
+    whiteSpace: 'pre-line',
+    lineHeight: 1.65,
+    color: '#1f2a4f',
+    fontSize: '0.96em',
+  },
 };
 
 const TaskBoard = () => {
@@ -234,7 +392,23 @@ const TaskBoard = () => {
   const [sortedTasks, setSortedTasks] = useState([]);
   const [sortBy, setSortBy] = useState('updatedAt'); // Default sorting by updatedAt
   const [statusFilter, setStatusFilter] = useState('all');
+  const [aiQuery, setAiQuery] = useState('');
+  const [aiAnswer, setAiAnswer] = useState('');
+  const [aiError, setAiError] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiTaskCount, setAiTaskCount] = useState(null);
+  const [aiModel, setAiModel] = useState('');
+  const [maxTasksForAI, setMaxTasksForAI] = useState(100);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const navigate = useNavigate();
+
+  const quickPrompts = [
+    'Convert my completed tasks into STAR interview stories.',
+    'What are the strongest impact points I can mention in interviews?',
+    'Generate behavioral interview questions based on my task history.',
+    'Summarize leadership and ownership examples from my tasks.',
+    'Create a 60-second project pitch from these tasks for interviews.',
+  ];
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -349,6 +523,56 @@ const TaskBoard = () => {
     return sortedTasks.filter(task => task.status === status);
   };
 
+  const handleAskTaskSummary = async (promptOverride) => {
+    const question = (promptOverride || aiQuery).trim();
+
+    if (!question) {
+      setAiError('Please enter a question for the AI assistant.');
+      return;
+    }
+
+    setAiError('');
+    setAiLoading(true);
+
+    try {
+      const token = localStorage.getItem('token');
+      const normalizedPath = aiSummaryEndpoint.startsWith('/') ? aiSummaryEndpoint : `/${aiSummaryEndpoint}`;
+      const response = await axios.post(
+        `${apiUrl}${normalizedPath}`,
+        {
+          query: question,
+          maxTasks: maxTasksForAI,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setAiQuery(question);
+      setAiAnswer(response.data?.answer || 'No response content was returned by the AI service.');
+      setAiTaskCount(response.data?.taskCount ?? null);
+      setAiModel(response.data?.model || '');
+    } catch (error) {
+      if (error.response?.status === 401) {
+        localStorage.removeItem('token');
+        navigate('/login');
+        return;
+      }
+
+      const message =
+        error.response?.data?.msg ||
+        error.response?.data?.error?.message ||
+        error.response?.data?.error ||
+        'Unable to get an AI answer right now. Please try again.';
+
+      setAiError(typeof message === 'string' ? message : 'Unable to get an AI answer right now. Please try again.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   // Convert the createdAt field to a readable date format
   const formatCreatedAt = (createdAt) => new Date(createdAt).toLocaleString();
 
@@ -360,6 +584,13 @@ const TaskBoard = () => {
           style={{ ...styles.button, ...styles.addButton }}
         >
           ＋ Add Task
+        </button>
+        <button
+          type="button"
+          onClick={() => setIsAiModalOpen(true)}
+          style={styles.aiLauncherButton}
+        >
+          Ask AI Assistant
         </button>
         <input
           type="text"
@@ -390,8 +621,87 @@ const TaskBoard = () => {
           </select>
         </div>
       </div>
+
+      {isAiModalOpen && (
+        <div style={styles.aiModalOverlay} onClick={() => setIsAiModalOpen(false)}>
+          <div style={styles.aiModalCard} onClick={(e) => e.stopPropagation()}>
+            <div style={styles.aiHeader}>
+              <div>
+                <h2 style={styles.aiTitle}>AI Interview Prep Assistant</h2>
+                <p style={styles.aiSubtitle}>Turn your tasks into interview-ready stories, impact points, and concise narratives.</p>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <select
+                  value={maxTasksForAI}
+                  onChange={(e) => setMaxTasksForAI(Number(e.target.value))}
+                  style={styles.aiCountSelect}
+                  aria-label="Maximum tasks for AI context"
+                >
+                  <option value={25}>Use 25 tasks</option>
+                  <option value={50}>Use 50 tasks</option>
+                  <option value={100}>Use 100 tasks</option>
+                  <option value={150}>Use 150 tasks</option>
+                  <option value={200}>Use 200 tasks</option>
+                </select>
+                <button type="button" style={styles.aiCloseButton} onClick={() => setIsAiModalOpen(false)}>
+                  Close
+                </button>
+              </div>
+            </div>
+
+            <div style={styles.aiInputArea}>
+              <textarea
+                value={aiQuery}
+                onChange={(e) => setAiQuery(e.target.value)}
+                placeholder="Example: Craft 3 STAR format stories from my completed tasks that I can use in interviews."
+                style={styles.aiTextarea}
+              />
+              <button
+                type="button"
+                onClick={() => handleAskTaskSummary()}
+                style={styles.aiAskButton}
+                disabled={aiLoading}
+              >
+                {aiLoading ? 'Thinking...' : 'Ask AI'}
+              </button>
+            </div>
+
+            <div style={styles.aiQuickPrompts}>
+              {quickPrompts.map((prompt) => (
+                <button
+                  key={prompt}
+                  type="button"
+                  style={styles.aiQuickButton}
+                  onClick={() => handleAskTaskSummary(prompt)}
+                  disabled={aiLoading}
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+
+            {aiError && (
+              <div style={styles.aiError} role="alert" aria-live="polite">
+                {aiError}
+              </div>
+            )}
+
+            {aiAnswer && !aiError && (
+              <div style={styles.aiAnswerCard}>
+                <div style={styles.aiAnswerMeta}>
+                  {aiTaskCount !== null && <span style={styles.aiMetaPill}>{`Tasks: ${aiTaskCount}`}</span>}
+                  {aiModel && <span style={styles.aiMetaPill}>{`Model: ${aiModel}`}</span>}
+                </div>
+                <p style={styles.aiAnswerText}>{aiAnswer}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <DragDropContext onDragEnd={onDragEnd}>
         <div style={styles.container}>
+
           {Object.values(TaskStatus)
             .filter(status => statusFilter === 'all' || status === statusFilter)
             .map(status => (

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import TaskBoard from './pages/Taskboard';
@@ -7,7 +7,6 @@ import PrivateRoute from './components/PrivateRoute';
 import CreateTaskPage from './pages/createTaskPage';
 import UpdateTaskPage from './pages/updateTaskPage';
 import TaskDetailsPage from './pages/TaskDetailPage';
-import GoogleAuth from './components/GoogleAuth';
 
 function App() {
   return (
