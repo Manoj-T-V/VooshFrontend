@@ -18,7 +18,7 @@ function SignupPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${apiUrl}/api/auth/register`, { firstName, lastName, email, password });
+      await axios.post(`${apiUrl}/api/auth/register`, { firstName, lastName, email, password });
       navigate('/login');
     } catch (error) {
       if (error.response) {
