@@ -10,6 +10,9 @@ function CreateTaskPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('To Do'); // Use exact enum value
+  const [submitError, setSubmitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAuthError, setIsAuthError] = useState(false);
   const navigate = useNavigate();
   
   const TaskStatus = {
@@ -26,6 +29,10 @@ function CreateTaskPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitError('');
+    setIsAuthError(false);
+    setIsSubmitting(true);
+
     try {
       await axios.post(
         `${apiUrl}/api/tasks`,
@@ -38,7 +45,15 @@ function CreateTaskPage() {
       );
       navigate('/tasks');
     } catch (error) {
+      if (error.response?.status === 401) {
+        setIsAuthError(true);
+        setSubmitError('Your session expired. Please log in again.');
+      } else {
+        setSubmitError(error.response?.data?.error || 'Unable to create task. Please try again.');
+      }
       console.error("Error creating task: ", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -138,6 +153,34 @@ function CreateTaskPage() {
       letterSpacing: '0.5px',
       boxShadow: '0 2px 8px 0 rgba(80,80,180,0.10)',
       transition: 'background 0.2s, box-shadow 0.2s',
+    },
+    errorBox: {
+      marginTop: '10px',
+      marginBottom: '4px',
+      width: '100%',
+      background: '#fff2f2',
+      color: '#9f1239',
+      border: '1px solid #fecaca',
+      borderRadius: '8px',
+      padding: '10px 12px',
+      fontSize: '0.95em',
+      boxSizing: 'border-box',
+    },
+    helperActions: {
+      display: 'flex',
+      gap: '10px',
+      marginTop: '8px',
+      flexWrap: 'wrap',
+    },
+    secondaryButton: {
+      border: 'none',
+      borderRadius: '6px',
+      padding: '8px 12px',
+      background: '#1d4ed8',
+      color: '#fff',
+      cursor: 'pointer',
+      fontWeight: 600,
+      fontSize: '0.9em',
     },
     float1: {
       position: 'absolute',
@@ -247,7 +290,25 @@ function CreateTaskPage() {
               </option>
             ))}
           </select>
-          <button type="submit" style={styles.button}>Create</button>
+          {submitError && (
+            <div style={styles.errorBox} role="alert" aria-live="polite">
+              <div>{submitError}</div>
+              {isAuthError && (
+                <div style={styles.helperActions}>
+                  <button
+                    type="button"
+                    style={styles.secondaryButton}
+                    onClick={() => navigate('/login')}
+                  >
+                    Go to Login
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+          <button type="submit" style={styles.button} disabled={isSubmitting}>
+            {isSubmitting ? 'Creating...' : 'Create'}
+          </button>
         </form>
       </motion.div>
     </div>

@@ -10,6 +10,11 @@ function UpdateTaskPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('To Do'); // Use exact enum value
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+  const [submitError, setSubmitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAuthError, setIsAuthError] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -25,28 +30,43 @@ function UpdateTaskPage() {
     { value: TaskStatus.DONE, label: 'Done' },
   ];
 
-  useEffect(() => {
-    const fetchTask = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`${apiUrl}/api/tasks/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setTitle(response.data.title);
-        setDescription(response.data.description);
-        setStatus(response.data.status);
-      } catch (error) {
-        console.error("Error fetching task: ", error);
-      }
-    };
+  const fetchTask = async () => {
+    setIsLoading(true);
+    setLoadError('');
+    setIsAuthError(false);
 
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${apiUrl}/api/tasks/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setTitle(response.data.title);
+      setDescription(response.data.description);
+      setStatus(response.data.status);
+    } catch (error) {
+      if (error.response?.status === 401) {
+        setIsAuthError(true);
+        setLoadError('Your session expired. Please log in again.');
+      } else {
+        setLoadError(error.response?.data?.error || 'Unable to load task details.');
+      }
+      console.error("Error fetching task: ", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchTask();
   }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitError('');
+    setIsSubmitting(true);
+
     try {
       await axios.put(`${apiUrl}/api/tasks/${id}`, { title, description, status }, {
         headers: {
@@ -55,7 +75,15 @@ function UpdateTaskPage() {
       });
       navigate('/tasks');
     } catch (error) {
+      if (error.response?.status === 401) {
+        setIsAuthError(true);
+        setSubmitError('Your session expired. Please log in again.');
+      } else {
+        setSubmitError(error.response?.data?.error || 'Unable to update task. Please try again.');
+      }
       console.error("Error updating task: ", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -137,7 +165,87 @@ function UpdateTaskPage() {
       boxShadow: '0 2px 8px 0 rgba(80,80,180,0.10)',
       transition: 'background 0.2s, box-shadow 0.2s',
     },
+    errorBox: {
+      marginTop: '10px',
+      marginBottom: '4px',
+      width: '100%',
+      background: '#fff2f2',
+      color: '#9f1239',
+      border: '1px solid #fecaca',
+      borderRadius: '8px',
+      padding: '10px 12px',
+      fontSize: '0.95em',
+      boxSizing: 'border-box',
+    },
+    helperActions: {
+      display: 'flex',
+      gap: '10px',
+      marginTop: '8px',
+      flexWrap: 'wrap',
+    },
+    secondaryButton: {
+      border: 'none',
+      borderRadius: '6px',
+      padding: '8px 12px',
+      background: '#1d4ed8',
+      color: '#fff',
+      cursor: 'pointer',
+      fontWeight: 600,
+      fontSize: '0.9em',
+    },
+    loading: {
+      minHeight: '100vh',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      fontSize: '1.05em',
+      color: '#1e3a8a',
+      background: 'linear-gradient(135deg, #e3f2fd 0%, #fce4ec 100%)',
+    },
+    errorContainer: {
+      minHeight: '100vh',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      background: 'linear-gradient(135deg, #e3f2fd 0%, #fce4ec 100%)',
+      padding: '16px',
+      boxSizing: 'border-box',
+    },
+    errorCard: {
+      width: '460px',
+      maxWidth: '100%',
+      background: '#fff',
+      border: '1px solid #fecaca',
+      borderRadius: '12px',
+      padding: '16px',
+      color: '#881337',
+      boxShadow: '0 6px 24px rgba(0,0,0,0.08)',
+    },
   };
+
+  if (isLoading) {
+    return <div style={styles.loading}>Loading task...</div>;
+  }
+
+  if (loadError) {
+    return (
+      <div style={styles.errorContainer}>
+        <div style={styles.errorCard} role="alert" aria-live="polite">
+          <div>{loadError}</div>
+          <div style={styles.helperActions}>
+            <button type="button" style={styles.secondaryButton} onClick={fetchTask}>
+              Retry
+            </button>
+            {isAuthError && (
+              <button type="button" style={styles.secondaryButton} onClick={() => navigate('/login')}>
+                Go to Login
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{...styles.container, position: 'relative', overflow: 'hidden'}}>
@@ -247,7 +355,25 @@ function UpdateTaskPage() {
               </option>
             ))}
           </select>
-          <button type="submit" style={styles.button}>Update</button>
+          {submitError && (
+            <div style={styles.errorBox} role="alert" aria-live="polite">
+              <div>{submitError}</div>
+              {isAuthError && (
+                <div style={styles.helperActions}>
+                  <button
+                    type="button"
+                    style={styles.secondaryButton}
+                    onClick={() => navigate('/login')}
+                  >
+                    Go to Login
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+          <button type="submit" style={styles.button} disabled={isSubmitting}>
+            {isSubmitting ? 'Updating...' : 'Update'}
+          </button>
         </form>
       </motion.div>
     </div>

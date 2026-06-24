@@ -325,6 +325,14 @@ const TaskBoard = () => {
   };
 
   const handleDelete = async (taskId) => {
+    const taskToDelete = tasks.find(task => task._id === taskId);
+    const taskTitle = taskToDelete?.title || 'this task';
+    const confirmed = window.confirm(`Delete "${taskTitle}"? This action cannot be undone.`);
+
+    if (!confirmed) {
+      return;
+    }
+
     try {
       await axios.delete(`${apiUrl}/api/tasks/${taskId}`, {
         headers: {
