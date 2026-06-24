@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useNavigate } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // API URL and Task Status Enum
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -379,10 +381,39 @@ const styles = {
   },
   aiAnswerText: {
     margin: 0,
-    whiteSpace: 'pre-line',
     lineHeight: 1.65,
     color: '#1f2a4f',
     fontSize: '0.96em',
+  },
+  aiMarkdown: {
+    color: '#1f2a4f',
+    fontSize: '0.96em',
+    lineHeight: 1.7,
+  },
+  aiCodeBlock: {
+    margin: '10px 0',
+    background: '#0f172a',
+    color: '#e2e8f0',
+    borderRadius: '10px',
+    padding: '10px 12px',
+    overflowX: 'auto',
+    fontSize: '0.9em',
+  },
+  aiInlineCode: {
+    background: '#e8efff',
+    color: '#1e3a8a',
+    borderRadius: '6px',
+    padding: '2px 6px',
+    fontSize: '0.9em',
+    fontWeight: 600,
+  },
+  aiBlockQuote: {
+    margin: '8px 0',
+    padding: '8px 12px',
+    borderLeft: '4px solid #93c5fd',
+    borderRadius: '8px',
+    background: '#eff6ff',
+    color: '#1e3a8a',
   },
 };
 
@@ -692,7 +723,32 @@ const TaskBoard = () => {
                   {aiTaskCount !== null && <span style={styles.aiMetaPill}>{`Tasks: ${aiTaskCount}`}</span>}
                   {aiModel && <span style={styles.aiMetaPill}>{`Model: ${aiModel}`}</span>}
                 </div>
-                <p style={styles.aiAnswerText}>{aiAnswer}</p>
+                <div style={styles.aiAnswerText}>
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      h1: ({ node, children, ...props }) => <h3 style={{ margin: '8px 0', color: '#17317f' }} {...props}>{children}</h3>,
+                      h2: ({ node, children, ...props }) => <h4 style={{ margin: '8px 0', color: '#17317f' }} {...props}>{children}</h4>,
+                      h3: ({ node, children, ...props }) => <h5 style={{ margin: '8px 0', color: '#17317f' }} {...props}>{children}</h5>,
+                      p: ({ node, children, ...props }) => <p style={{ margin: '8px 0' }} {...props}>{children}</p>,
+                      ul: ({ node, children, ...props }) => <ul style={{ margin: '8px 0 8px 18px', padding: 0 }} {...props}>{children}</ul>,
+                      ol: ({ node, children, ...props }) => <ol style={{ margin: '8px 0 8px 18px', padding: 0 }} {...props}>{children}</ol>,
+                      li: ({ node, children, ...props }) => <li style={{ marginBottom: '5px' }} {...props}>{children}</li>,
+                      blockquote: ({ node, children, ...props }) => <blockquote style={styles.aiBlockQuote} {...props}>{children}</blockquote>,
+                      a: ({ node, children, ...props }) => <a style={{ color: '#1d4ed8', fontWeight: 600 }} {...props}>{children}</a>,
+                      code: ({ node, inline, className, children, ...props }) =>
+                        inline ? (
+                          <code style={styles.aiInlineCode} {...props}>{children}</code>
+                        ) : (
+                          <pre style={styles.aiCodeBlock}>
+                            <code className={className} {...props}>{children}</code>
+                          </pre>
+                        ),
+                    }}
+                  >
+                    {aiAnswer}
+                  </ReactMarkdown>
+                </div>
               </div>
             )}
           </div>
