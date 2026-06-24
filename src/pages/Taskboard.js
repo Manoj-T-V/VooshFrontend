@@ -403,11 +403,11 @@ const TaskBoard = () => {
   const navigate = useNavigate();
 
   const quickPrompts = [
-    'Convert my completed tasks into STAR interview stories.',
-    'What are the strongest impact points I can mention in interviews?',
-    'Generate behavioral interview questions based on my task history.',
-    'Summarize leadership and ownership examples from my tasks.',
-    'Create a 60-second project pitch from these tasks for interviews.',
+    'Turn my completed tasks into STAR-format interview answers.',
+    'Which tasks show strongest impact I can mention in interviews?',
+    'Create interview talking points from my recent task history.',
+    'Find leadership and ownership examples from my tasks for interviews.',
+    'Draft a 60-second interview pitch using my top tasks.',
   ];
 
   useEffect(() => {
@@ -627,8 +627,8 @@ const TaskBoard = () => {
           <div style={styles.aiModalCard} onClick={(e) => e.stopPropagation()}>
             <div style={styles.aiHeader}>
               <div>
-                <h2 style={styles.aiTitle}>AI Interview Prep Assistant</h2>
-                <p style={styles.aiSubtitle}>Turn your tasks into interview-ready stories, impact points, and concise narratives.</p>
+                <h2 style={styles.aiTitle}>Stop Searching. Start Asking!</h2>
+                <p style={styles.aiSubtitle}>Ask questions on your tasks, find answers faster, and save time.</p>
               </div>
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                 <select
