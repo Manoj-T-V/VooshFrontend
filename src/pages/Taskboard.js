@@ -425,6 +425,8 @@ const styles = {
 
 const TaskBoard = () => {
   const [tasks, setTasks] = useState([]);
+  const [versions, setVersions] = useState([]);
+  const [versionFilter, setVersionFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortedTasks, setSortedTasks] = useState([]);
   const [sortBy, setSortBy] = useState('updatedAt'); // Default sorting by updatedAt
@@ -451,12 +453,27 @@ const TaskBoard = () => {
     const fetchTasks = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(`${apiUrl}/api/tasks`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setTasks(response.data);
+        const [tasksResponse, versionsResponse] = await Promise.all([
+          axios.get(`${apiUrl}/api/tasks`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          axios.get(`${apiUrl}/api/tasks/versions`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+        ]);
+
+        const taskList = Array.isArray(tasksResponse.data) ? tasksResponse.data : [];
+        const versionList = Array.isArray(versionsResponse.data) ? versionsResponse.data : [];
+
+        setTasks(taskList);
+        setVersions(versionList);
+
+        const defaultVersion = versionList.find((item) => item.versionCode === 'v1') || versionList[0];
+        setVersionFilter(defaultVersion?._id || 'all');
       } catch (error) {
         if (error.response) {
           const { status } = error.response;
@@ -477,6 +494,25 @@ const TaskBoard = () => {
       task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       task.description.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    if (versionFilter !== 'all') {
+      const selectedVersion = versions.find((item) => item._id === versionFilter);
+      const isDefaultV1 = selectedVersion?.versionCode === 'v1';
+
+      filteredTasks = filteredTasks.filter((task) => {
+        if (task.versionId === versionFilter) {
+          return true;
+        }
+
+        // Allow legacy tasks with missing versionId to appear under default v1.
+        if (isDefaultV1 && !task.versionId) {
+          return true;
+        }
+
+        return false;
+      });
+    }
+
     if (statusFilter !== 'all') {
       filteredTasks = filteredTasks.filter(task => task.status === statusFilter);
     }
@@ -494,7 +530,7 @@ const TaskBoard = () => {
       });
     };
     setSortedTasks(sortTasks(filteredTasks));
-  }, [searchQuery, tasks, sortBy, statusFilter]);
+  }, [searchQuery, tasks, sortBy, statusFilter, versionFilter, versions]);
 
   const onDragEnd = async (result) => {
     const { destination, source, draggableId } = result;
@@ -661,6 +697,18 @@ const TaskBoard = () => {
             <option style={styles.option} value="To Do">To Do</option>
             <option style={styles.option} value="In Progress">In Progress</option>
             <option style={styles.option} value="Done">Done</option>
+          </select>
+          <select
+            value={versionFilter}
+            onChange={(e) => setVersionFilter(e.target.value)}
+            style={{ ...styles.select, minWidth: 180 }}
+          >
+            <option style={styles.option} value="all">All Versions</option>
+            {versions.map((version) => (
+              <option key={version._id} value={version._id}>
+                {`${version.versionCode} - ${version.versionName}`}
+              </option>
+            ))}
           </select>
         </div>
       </div>
