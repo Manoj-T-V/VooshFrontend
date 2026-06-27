@@ -40,6 +40,9 @@
 .nav-link.signup {
   background: linear-gradient(90deg, #ff512f 0%, #dd2476 100%);
 }
+.nav-link.versions {
+  background: linear-gradient(90deg, #0ea5e9 0%, #2563eb 100%);
+}
 button.nav-link.logout {
   background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%);
   color: #333;
@@ -57,6 +60,10 @@ button.nav-link.logout {
 }
 .nav-link.signup:hover {
   background: #dd2476;
+  color: #fff;
+}
+.nav-link.versions:hover {
+  background: #1d4ed8;
   color: #fff;
 }
 button.nav-link.logout:hover {

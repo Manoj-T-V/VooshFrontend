@@ -184,6 +184,12 @@ const styles = {
   addButton: {
     backgroundColor: '#007bff', // Blue background
   },
+  versionsButton: {
+    background: 'linear-gradient(90deg, #0ea5e9 0%, #2563eb 100%)',
+    color: '#fff',
+    border: 'none',
+    boxShadow: '0 2px 8px 0 rgba(37,99,235,0.16)',
+  },
   editButton: {
     background: 'linear-gradient(90deg, #43cea2 0%, #185a9d 100%)',
     color: '#fff',
@@ -615,6 +621,12 @@ const TaskBoard = () => {
           style={{ ...styles.button, ...styles.addButton }}
         >
           ＋ Add Task
+        </button>
+        <button
+          onClick={() => navigate('/versions')}
+          style={{ ...styles.button, ...styles.versionsButton }}
+        >
+          Versions
         </button>
         <button
           type="button"

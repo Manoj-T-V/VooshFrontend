@@ -27,7 +27,10 @@ const Navbar = () => {
             <Link to="/signup" className="nav-link signup">Signup</Link>
           </>
         ) : (
-          <button onClick={handleLogout} className="nav-link logout">Logout</button>
+          <>
+            <Link to="/versions" className="nav-link versions">Versions</Link>
+            <button onClick={handleLogout} className="nav-link logout">Logout</button>
+          </>
         )}
       </div>
     </nav>

@@ -7,6 +7,7 @@ import PrivateRoute from './components/PrivateRoute';
 import CreateTaskPage from './pages/createTaskPage';
 import UpdateTaskPage from './pages/updateTaskPage';
 import TaskDetailsPage from './pages/TaskDetailPage';
+import VersionsPage from './pages/VersionsPage';
 
 function App() {
   return (
@@ -24,6 +25,12 @@ function App() {
         <Route path="/tasks/create" element={<CreateTaskPage />} />
         <Route path="/tasks/update/:id" element={<UpdateTaskPage />} />
         <Route path="/tasks/details/:id" element={<TaskDetailsPage />} />
+        <Route
+          path="/versions"
+          element={
+            <PrivateRoute element={<VersionsPage />} />
+          }
+        />
         <Route path="/" element={<Navigate to="/tasks" />} />
       </Routes>
       </>
