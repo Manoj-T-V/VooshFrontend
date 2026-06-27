@@ -386,21 +386,11 @@ function VersionsPage() {
   return (
     <div style={styles.page}>
       <div style={styles.shell}>
-        <h1 style={styles.heading}>Task Versions</h1>
-        <p style={styles.subHeading}>Manage version snapshots with only supported backend operations.</p>
-
-        <div style={styles.operationBar}>
-          <span style={styles.operationPill}>Create</span>
-          <span style={styles.operationPill}>Read List</span>
-          <span style={styles.operationPill}>Read Detail</span>
-          <span style={styles.operationPill}>Switch Snapshot</span>
-          <span style={styles.unsupportedPill}>Update: Not Supported</span>
-          <span style={styles.unsupportedPill}>Delete: Not Supported</span>
-        </div>
+        <h1 style={styles.heading}>Versions</h1>
 
         <div style={styles.grid}>
           <div style={styles.card}>
-            <h2 style={styles.cardTitle}>Create Version</h2>
+            <h2 style={styles.cardTitle}>Create</h2>
             <form onSubmit={handleCreateVersion}>
               <input
                 type="text"
@@ -413,7 +403,7 @@ function VersionsPage() {
               <textarea
                 value={note}
                 onChange={(event) => setNote(event.target.value)}
-                placeholder="Note (optional)"
+                placeholder="Note"
                 style={styles.textarea}
               />
               <button
@@ -421,19 +411,13 @@ function VersionsPage() {
                 style={styles.primaryButton}
                 disabled={createPending || !versionName.trim()}
               >
-                {createPending ? 'Creating...' : 'Create Version'}
+                {createPending ? 'Creating...' : 'Create'}
               </button>
             </form>
-            <div style={{ marginTop: '10px', fontSize: '0.83em', color: '#64748b' }}>
-              Create button is disabled until a version name is provided.
-            </div>
           </div>
 
           <div style={styles.card}>
-            <h2 style={styles.cardTitle}>Version List</h2>
-            <div style={styles.infoBox}>
-              Use View to inspect snapshot tasks and Switch to replace current tasks with a selected version.
-            </div>
+            <h2 style={styles.cardTitle}>List</h2>
 
             {loading ? (
               <div>Loading versions...</div>
@@ -496,13 +480,13 @@ function VersionsPage() {
               </button>
             </div>
 
-            {detailLoading && <div style={{ marginTop: '10px' }}>Loading detail...</div>}
+            {detailLoading && <div style={{ marginTop: '10px' }}>Loading...</div>}
 
             {!detailLoading && detailVersion && (
               <>
                 <div style={styles.infoBox}>
                   <strong>{`${detailVersion.versionCode} - ${detailVersion.versionName}`}</strong>
-                  <div style={{ marginTop: '6px' }}>{detailVersion.note || 'No note provided.'}</div>
+                  <div style={{ marginTop: '6px' }}>{detailVersion.note || '-'}</div>
                 </div>
 
                 <button
@@ -513,12 +497,12 @@ function VersionsPage() {
                 >
                   {switchPendingId === (detailVersion._id || detailVersion.id)
                     ? 'Switching...'
-                    : 'Switch to this version'}
+                    : 'Switch'}
                 </button>
 
                 <div style={styles.snapshots}>
                   {(detailVersion.tasks || []).length === 0 ? (
-                    <div style={styles.infoBox}>No snapshot tasks in this version.</div>
+                    <div style={styles.infoBox}>No tasks.</div>
                   ) : (
                     detailVersion.tasks.map((snapshot, index) => (
                       <div
@@ -526,8 +510,8 @@ function VersionsPage() {
                         style={styles.snapshot}
                       >
                         <p style={styles.snapshotTitle}>{snapshot.title}</p>
-                        <p style={styles.snapshotMeta}><strong>Status:</strong> {snapshot.status}</p>
-                        <p style={styles.snapshotMeta}>{snapshot.description || 'No description provided.'}</p>
+                        <p style={styles.snapshotMeta}>{snapshot.status}</p>
+                        <p style={styles.snapshotMeta}>{snapshot.description || '-'}</p>
                       </div>
                     ))
                   )}

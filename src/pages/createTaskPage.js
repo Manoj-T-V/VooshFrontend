@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +10,9 @@ function CreateTaskPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('To Do'); // Use exact enum value
+  const [versions, setVersions] = useState([]);
+  const [selectedVersionId, setSelectedVersionId] = useState('');
+  const [isLoadingVersions, setIsLoadingVersions] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAuthError, setIsAuthError] = useState(false);
@@ -27,6 +30,36 @@ function CreateTaskPage() {
     { value: TaskStatus.DONE, label: 'Done' },
   ];
 
+  useEffect(() => {
+    const fetchVersions = async () => {
+      setIsLoadingVersions(true);
+
+      try {
+        const response = await axios.get(`${apiUrl}/api/tasks/versions`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+
+        const versionList = Array.isArray(response.data) ? response.data : [];
+        setVersions(versionList);
+
+        const defaultVersion = versionList.find((item) => item.versionCode === 'v1') || versionList[0];
+        setSelectedVersionId(defaultVersion?._id || '');
+      } catch (error) {
+        if (error.response?.status === 401) {
+          setIsAuthError(true);
+          setSubmitError('Your session expired. Please log in again.');
+        }
+      } finally {
+        setIsLoadingVersions(false);
+      }
+    };
+
+    fetchVersions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitError('');
@@ -34,9 +67,20 @@ function CreateTaskPage() {
     setIsSubmitting(true);
 
     try {
+      const payload = {
+        title,
+        description,
+        status,
+      };
+
+      if (selectedVersionId) {
+        payload.versionId = selectedVersionId;
+        payload.version = selectedVersionId;
+      }
+
       await axios.post(
         `${apiUrl}/api/tasks`,
-        { title, description, status },
+        payload,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -287,6 +331,19 @@ function CreateTaskPage() {
             {statusOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
+              </option>
+            ))}
+          </select>
+          <select
+            value={selectedVersionId}
+            onChange={(e) => setSelectedVersionId(e.target.value)}
+            style={styles.select}
+            disabled={isLoadingVersions}
+          >
+            <option value="">Default (v1)</option>
+            {versions.map((version) => (
+              <option key={version._id} value={version._id}>
+                {`${version.versionCode} - ${version.versionName}`}
               </option>
             ))}
           </select>

@@ -10,6 +10,8 @@ function UpdateTaskPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('To Do'); // Use exact enum value
+  const [versions, setVersions] = useState([]);
+  const [selectedVersionId, setSelectedVersionId] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [submitError, setSubmitError] = useState('');
@@ -37,14 +39,27 @@ function UpdateTaskPage() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${apiUrl}/api/tasks/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setTitle(response.data.title);
-      setDescription(response.data.description);
-      setStatus(response.data.status);
+      const [taskResponse, versionsResponse] = await Promise.all([
+        axios.get(`${apiUrl}/api/tasks/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }),
+        axios.get(`${apiUrl}/api/tasks/versions`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }),
+      ]);
+
+      setTitle(taskResponse.data.title);
+      setDescription(taskResponse.data.description);
+      setStatus(taskResponse.data.status);
+
+      const versionList = Array.isArray(versionsResponse.data) ? versionsResponse.data : [];
+      setVersions(versionList);
+      const defaultVersion = versionList.find((item) => item.versionCode === 'v1') || versionList[0];
+      setSelectedVersionId(taskResponse.data.versionId || defaultVersion?._id || '');
     } catch (error) {
       if (error.response?.status === 401) {
         setIsAuthError(true);
@@ -69,7 +84,18 @@ function UpdateTaskPage() {
     setIsSubmitting(true);
 
     try {
-      await axios.put(`${apiUrl}/api/tasks/${id}`, { title, description, status }, {
+      const payload = {
+        title,
+        description,
+        status,
+      };
+
+      if (selectedVersionId) {
+        payload.versionId = selectedVersionId;
+        payload.version = selectedVersionId;
+      }
+
+      await axios.put(`${apiUrl}/api/tasks/${id}`, payload, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
@@ -353,6 +379,18 @@ function UpdateTaskPage() {
             {statusOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
+              </option>
+            ))}
+          </select>
+          <select
+            value={selectedVersionId}
+            onChange={(e) => setSelectedVersionId(e.target.value)}
+            style={styles.select}
+          >
+            <option value="">Default (v1)</option>
+            {versions.map((version) => (
+              <option key={version._id} value={version._id}>
+                {`${version.versionCode} - ${version.versionName}`}
               </option>
             ))}
           </select>
